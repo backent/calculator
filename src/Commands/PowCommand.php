@@ -3,6 +3,8 @@
 namespace Jakmall\Recruitment\Calculator\Commands;
 
 use Illuminate\Console\Command;
+use Jakmall\Recruitment\Calculator\History\Infrastructure\CommandHistoryManagerInterface;
+
 
 class PowCommand extends Command
 {
@@ -16,8 +18,11 @@ class PowCommand extends Command
      */
     protected $description;
 
-    public function __construct()
+    protected $history;
+
+    public function __construct(CommandHistoryManagerInterface $history)
     {
+        $this->history = $history;
         $commandVerb = $this->getCommandVerb();
         
         $this->signature = $this->getSignature();
@@ -61,6 +66,9 @@ class PowCommand extends Command
         $description = $this->generateCalculationDescription($numbers);
         $result = $this->calculate($numbers['base'], $numbers['exp']);
 
+        $dataToSave = $this->getDataToSave($description, $result);
+        $this->history->log($dataToSave);
+
         $this->comment(sprintf('%s = %s', $description, $result));
     }
 
@@ -100,5 +108,17 @@ class PowCommand extends Command
     {
 
         return pow($base, $exp);
+    }
+
+    protected function getDataToSave($description, $result): array 
+    {
+        $output = sprintf('%s = %s', $description, $result);
+        $data = [
+            "command" => $this->getCommandVerb(),
+            "description" => $description,
+            "result" => $result,
+            "output" => $output,
+        ];
+        return $data;
     }
 }

@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": ">=7.3.4",
+        "doctrine/orm": "^2.7",
         "illuminate/console": "5.8.*",
         "illuminate/container": "5.8.*",
         "illuminate/events": "5.8.*",

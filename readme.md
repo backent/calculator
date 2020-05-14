@@ -7,6 +7,11 @@
 ```
 ./composer install
 ```
+## Create Database
+```
+./php vendor/bin/doctrine orm:schema-tool:update --force --dump-sql
+```
+
 ## Run the Calculator
 ```
 ./calculator

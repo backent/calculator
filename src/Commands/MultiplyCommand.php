@@ -3,6 +3,8 @@
 namespace Jakmall\Recruitment\Calculator\Commands;
 
 use Illuminate\Console\Command;
+use Jakmall\Recruitment\Calculator\History\Infrastructure\CommandHistoryManagerInterface;
+
 
 class MultiplyCommand extends Command
 {
@@ -16,8 +18,11 @@ class MultiplyCommand extends Command
      */
     protected $description;
 
-    public function __construct()
+    protected $history;
+
+    public function __construct(CommandHistoryManagerInterface $history)
     {
+        $this->history = $history;
         $commandVerb = $this->getCommandVerb();
 
         $this->signature = sprintf(
@@ -44,6 +49,9 @@ class MultiplyCommand extends Command
         $numbers = $this->getInput();
         $description = $this->generateCalculationDescription($numbers);
         $result = $this->calculateAll($numbers);
+
+        $dataToSave = $this->getDataToSave($description, $result);
+        $this->history->log($dataToSave);
 
         $this->comment(sprintf('%s = %s', $description, $result));
     }
@@ -91,5 +99,17 @@ class MultiplyCommand extends Command
     protected function calculate($number1, $number2)
     {
         return $number1 * $number2;
+    }
+
+    protected function getDataToSave($description, $result): array 
+    {
+        $output = sprintf('%s = %s', $description, $result);
+        $data = [
+            "command" => $this->getCommandVerb(),
+            "description" => $description,
+            "result" => $result,
+            "output" => $output,
+        ];
+        return $data;
     }
 }
