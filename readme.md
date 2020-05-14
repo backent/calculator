@@ -7,7 +7,13 @@
 ```
 ./composer install
 ```
+
 ## Create Database
+```
+./php vendor/bin/doctrine orm:schema-tool:create
+```
+
+## Update Database
 ```
 ./php vendor/bin/doctrine orm:schema-tool:update --force --dump-sql
 ```

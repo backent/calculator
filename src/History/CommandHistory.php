@@ -29,6 +29,38 @@ class CommandHistory implements CommandHistoryManagerInterface
     }
 
     /**
+     * Returns command history.
+     *
+     * @return array
+     */
+    public function findById($id): array {
+        
+        $history = $this->entityManager->find(History::class, $id);
+        $data= [
+            "id" => $history->getId(),
+            "command" => $history->getCommand(),
+            "description" => $history->getDescription(),
+            "output" => $history->getOutput(),
+            "result" => $history->getResult(),
+            "time" => $history->getTime(),
+        ];
+        return $data;
+    }
+
+    public function deleteById($id) {
+        try {
+            $qb = $this->entityManager->createQueryBuilder();
+            $qb->delete(History::class, 'h')
+            ->where('h.id = ?0')
+            ->setParameter(0, $id)
+            ->getQuery()->getResult();
+            return true;
+        } catch (Exception $e) {
+            return false;                            
+        }
+    }
+
+    /**
      * Log command data to storage.
      *
      * @param mixed $command The command to log.
@@ -86,6 +118,7 @@ class CommandHistory implements CommandHistoryManagerInterface
         $result = [];
         foreach ($data as $item) {
             $result[] = [
+                "id" => $item->getId(),
                 "command" => $item->getCommand(),
                 "description" => $item->getDescription(),
                 "output" => $item->getOutput(),
